@@ -1,0 +1,205 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .parameter {
+
+            height: 100%;
+            width: 100%;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .ping-pong-ball {
+            position: absolute;
+            border-radius: 50%;
+            height: 2em;
+            width: 2em;
+            background-color: aqua;
+            /* animation: changePlace 2s ease-in-out infinite alternate; */
+        }
+
+        .bar {
+            height: 1.5em;
+            width: 10em;
+            border-radius: 4px;
+            background-color: cornflowerblue;
+            font-family: sans-serif;
+            color: white;
+            text-align: center;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="parameter">
+        <div class="ping-pong-ball"></div>
+        <div class="bar">
+            Rod 1
+        </div>
+        <div class="bar">Rod 2</div>
+    </div>
+    <script>
+        
+        var scoreBar1 = 0;
+        var scoreBar2 = 0;
+        var maxScore = 10;
+        var id;
+        var ball = document.getElementsByClassName("ping-pong-ball");
+        ball = ball[0];
+        var box = document.getElementsByClassName("parameter");
+        box = box[0];
+        var bar = document.getElementsByClassName("bar");
+        var bar1 = bar[0];
+        var bar2 = bar[1];
+        var heightOfBox = box.offsetHeight;
+        var widthOfBox = box.offsetWidth;
+        var widthOfBar = bar1.offsetWidth;
+        bar1.style.left = widthOfBox / 2 - (widthOfBar / 2);
+        bar2.style.left = widthOfBox / 2 - (widthOfBar / 2);
+        bar1.style.bottom = 0;
+        var barX = bar1.offsetLeft;
+        window.addEventListener("keydown", function (Event) {
+            if (Event.keyCode == 13 || Event.keyCode == 107) {
+                console.log(id);
+                   gameStar();
+                
+            }
+            if (Event.keyCode == 65 || Event.keyCode == 37) {
+                if (barX >= 20) {
+                    barX -= 20;
+                    bar1.style.left = barX;
+                    bar2.style.left = barX;
+                }
+            }
+            if (Event.keyCode == 68 || Event.keyCode == 39) {
+                if (barX < box.offsetWidth - 180)
+                    barX += 20;
+                bar1.style.left = barX;
+                bar2.style.left = barX;
+            }
+        });
+        ball.style.left = widthOfBox / 2 - 16;
+        ball.style.top = heightOfBox - (32 + 24);
+        var curY = ball.offsetLeft;
+        var curX = ball.offsetTop;
+        var quad = 1;
+        var msg1=localStorage.getItem("winner")+" has maximum score of "+localStorage.getItem("maxScore");
+            alert(msg1);
+        function gameStar(){
+            bar1.style.left = widthOfBox / 2 - (widthOfBar / 2);
+            bar2.style.left = widthOfBox / 2 - (widthOfBar / 2);
+          bar1.style.bottom = 0;
+             barX = bar1.offsetLeft;
+             ball.style.left = widthOfBox / 2 - 16;
+        ball.style.top = heightOfBox - (32 + 24);
+         curY = ball.offsetLeft;
+         curX = ball.offsetTop;
+         quad = 1;
+        
+            id = setInterval(getNewPost, 5);
+            
+        }
+        function gameOver() {
+            clearInterval(id);
+            var winner= scoreBar1 > scoreBar2 ? "rod 1" : "rod 2" ;
+            var msg = winner +" wins with a score of "+Math.max(scoreBar1,scoreBar2)+"."; 
+            console.log(msg);
+             
+            if(localStorage.getItem("maxScore")==undefined){
+                localStorage.setItem("maxScore",Math.max(scoreBar2,scoreBar1));
+                localStorage.setItem("winner",winner);
+            }else{
+                if(localStorage.getItem("winner") !== winner){
+                    localStorage.setItem("winner",winner);
+                }     
+                localStorage.setItem("maxScore",Math.max(scoreBar2,scoreBar1,localStorage.getItem("maxScore")));
+            }
+            window.alert(msg+"Max score is:"+localStorage.getItem("maxScore"));
+            console.log(id);
+        }
+        function getNewPost() {
+            if (ball.offsetLeft >= box.offsetWidth - 32 || ball.offsetLeft < 0 ||
+                ball.offsetTop >= box.offsetHeight - (32 + 24) || ball.offsetTop < 24
+            ) {
+                if (ball.offsetLeft >= box.offsetWidth - 32) {
+                    ball.style.left = box.offsetWidth - 34;
+                    if (quad == 1) {
+                        quad = 2;
+                    } else {
+                        quad = 3;
+                    }
+                }
+                if (ball.offsetLeft < 0) {
+                    ball.style.left = 0;
+                    if (quad == 2) {
+                        quad = 1;
+                    } else {
+                        quad = 4;
+                    }
+                }
+                if (ball.offsetTop >= box.offsetHeight - (32 + 24)) {
+                    if (ball.offsetLeft >= bar1.offsetLeft && ball.offsetLeft <= bar1.offsetLeft + 160) {
+                        scoreBar1 += 100;
+                        ball.style.top = box.offsetHeight - (33 + 24);
+                        if (quad == 3) {
+                            quad = 2;
+                        } else {
+                            quad = 1;
+                        }
+                    } else {
+                        gameOver();
+                    }
+                }
+                if (ball.offsetTop < 24) {
+                    if (ball.offsetLeft >= bar1.offsetLeft && ball.offsetLeft <= bar1.offsetLeft + 160) {
+                        scoreBar2 += 100;
+                        ball.style.top = 25;
+                        if (quad == 1) {
+                            quad = 4;
+                        } else {
+                            quad = 3;
+                        }
+                    } else {
+                        gameOver();
+                    }
+                }
+                console.log("hey")
+                curY = ball.offsetLeft;
+                curX = ball.offsetTop;
+            } else {
+                if (quad == 1) {
+                    curY++; curX--;
+                    ball.style.left = curY;
+                    ball.style.top = curX;
+                }
+                if (quad == 2) {
+                    curY--; curX--;
+                    ball.style.left = curY;
+                    ball.style.top = curX;
+                }
+                if (quad == 3) {
+                    curY--; curX++;
+                    ball.style.left = curY;
+                    ball.style.top = curX;
+                }
+                if (quad == 4) {
+                    curY++; curX++;
+                    ball.style.left = curY;
+                    ball.style.top = curX;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
